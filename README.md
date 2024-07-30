@@ -19,9 +19,8 @@ Bienvenue dans le menu F5 avancé pour FiveM ! Ce menu super stylé est construi
 
 # Aperçu 
 
-Découvrez la démo en vidéo sur YouTube :https://youtu.be/WsDe4YUM-18
+Découvrez la démo en vidéo sur YouTube : https://youtu.be/WsDe4YUM-18
 
 Amusez-vous bien avec ce menu F5 et n'hésitez pas à apporter des modifications pour l'adapter à vos besoins !
 
-** Cliquez ici pour le télécharger **:  soon
 
