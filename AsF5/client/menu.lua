@@ -91,7 +91,6 @@ Citizen.CreateThread(function()
     end)
 end)
 -- Key Control
--- Fix: replaced the permanent Wait(0) key-detection thread with a command + key mapping (no per-frame polling).
 -- Players can also rebind the key in the FiveM settings.
 RegisterCommand('asf5_openmenu', function()
     OpenF5Menu()
@@ -103,7 +102,6 @@ Citizen.CreateThread(function()
     while true do
         local playerPed = PlayerPedId()
         local vehicle = GetVehiclePedIsIn(playerPed, false)
-        -- Fix: adaptive wait — only poll every second while driving, otherwise idle longer to save CPU
         local waitTime = 2000
         if vehicle ~= 0 then
             waitTime = 1000
@@ -179,14 +177,12 @@ function OpenF5Menu()
 
     -- Fetch player data from server before opening the menu
     ESX.TriggerServerCallback('example:getPlayerInfo', function(data)
-        -- Fix: guard against a nil payload so the menu never errors on missing player data
         if not data then return end
         playerName = data.name or ""
         if data.job then playerJob = (data.job.label or "") .. " - " .. (data.job.grade_label or "") end
         if data.job2 then playerJob2 = (data.job2.label or "") .. " - " .. (data.job2.grade_label or "") end
         isBoss = data.isBoss
         isOrgBoss = data.isOrgBoss
-        -- Fix: default to empty tables so the employee/member loops never iterate over nil
         employees = data.employees or {}
         organizationMembers = data.organizationMembers or {}
     end)
@@ -204,7 +200,6 @@ function OpenF5Menu()
                     RageUI.Button("Inventaire", "Voir votre inventaire", {RightLabel = "→→→"}, true, {
                         onSelected = function()
                             ESX.TriggerServerCallback('esx:getPlayerInventory', function(inventory)
-                                -- Fix: guard against a nil inventory payload before dereferencing
                                 if not inventory then return end
                                 inventoryItems = inventory.items or {}
                                 RageUI.Visible(inventoryMenu, true)
@@ -520,7 +515,6 @@ function OpenF5Menu()
                 local vehicleFuel = exports['LegacyFuel']:GetFuel(vehicle)
                 local vehiclePlate = GetVehicleNumberPlateText(vehicle)
                 local vehicleModel = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
-                -- Fix: GetSourcevehicle was a nil global (missing parentheses); use the local vehicle handle computed above
                 local Vengine = GetVehicleEngineHealth(vehicle) / 10
                 RageUI.Separator("~y~Informations du véhicule")
                 RageUI.Separator("Modèle: " .. vehicleModel)
@@ -845,7 +839,6 @@ function OpenF5Menu()
             end)
 
             RageUI.IsVisible(administrationMenu, function()
-                -- Fix: client-side admin gate (defense-in-depth). Purely client actions below (noclip/invis/spawn/TP/repair)
                 -- cannot be enforced server-side; the real protection MUST come from the anticheat.
                 -- Server-effect actions (revive/heal) are re-verified server-side via source + group.
                 if not hasAdminPermissions() then
@@ -855,13 +848,11 @@ function OpenF5Menu()
                 RageUI.Button("TP au joueur", nil, {}, true, {
                     onSelected = function()
                         local playerId = KeyboardInput("Entrez l'ID du joueur", "", 10)
-                        -- Fix: validate the ID is a real number before using it
                         local targetServerId = tonumber(playerId)
                         if targetServerId then
                             local targetPlayer = GetPlayerFromServerId(targetServerId)
                             local targetPed = GetPlayerPed(targetPlayer)
 
-                            -- Fix: GetPlayerPed always returns a number; check the player handle and ped existence properly
                             if targetPlayer ~= -1 and DoesEntityExist(targetPed) then
                                 local targetCoords = GetEntityCoords(targetPed)
                                 local targetName = GetPlayerName(targetPlayer)
